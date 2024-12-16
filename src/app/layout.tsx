@@ -1,3 +1,4 @@
+import QueryClientProvider from "@lib/context/query-context"
 import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import "styles/globals.css"
@@ -10,7 +11,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" data-mode="light">
       <body>
-        <main className="relative">{props.children}</main>
+        <main className="relative">
+          <QueryClientProvider>{props.children}</QueryClientProvider>
+        </main>
       </body>
     </html>
   )

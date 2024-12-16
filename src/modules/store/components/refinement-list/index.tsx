@@ -4,16 +4,18 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback } from "react"
 
 import SortProducts, { SortOptions } from "./sort-products"
-import BrandsFilter from "./brands"
+import FilterProducts from "./filter-products"
 
 type RefinementListProps = {
   sortBy: SortOptions
+  brandId?: string
   search?: boolean
   "data-testid"?: string
 }
 
 const RefinementList = ({
   sortBy,
+  brandId,
   "data-testid": dataTestId,
 }: RefinementListProps) => {
   const router = useRouter()
@@ -42,8 +44,8 @@ const RefinementList = ({
         setQueryParams={setQueryParams}
         data-testid={dataTestId}
       />
-      <BrandsFilter
-        sortBy={sortBy}
+      <FilterProducts
+        brandId={brandId}
         setQueryParams={setQueryParams}
         data-testid={dataTestId}
       />
