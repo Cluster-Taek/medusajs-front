@@ -10,7 +10,7 @@ type PaginatedProductsParams = {
   limit: number
   collection_id?: string[]
   category_id?: string[]
-  brand_id?: string[]
+  brand_id?: string
   id?: string[]
   order?: string
 }
@@ -52,9 +52,9 @@ export default async function PaginatedProducts({
     queryParams["order"] = "created_at"
   }
 
-  // if (brandId) {
-  //   queryParams["brand_id"] = [brandId]
-  // }
+  if (brandId) {
+    queryParams["brand_id"] = brandId
+  }
 
   const region = await getRegion(countryCode)
 

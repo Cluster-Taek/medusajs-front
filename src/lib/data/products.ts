@@ -90,6 +90,49 @@ export const getProductsList = cache(async function ({
     })
 })
 
+export const getProductsListByBrand = cache(async function ({
+  pageParam = 1,
+  queryParams,
+  countryCode,
+}: {
+  pageParam?: number
+  queryParams?: HttpTypes.FindParams &
+    HttpTypes.StoreProductParams & { brand_id: string }
+  countryCode: string
+}): Promise<{
+  response: { products: HttpTypes.StoreProduct[]; count: number }
+  nextPage: number | null
+  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
+}> {
+  const limit = queryParams?.limit || 12
+  const offset = pageParam * limit
+  const region = await getRegion(countryCode)
+
+  if (!region) {
+    return {
+      response: { products: [], count: 0 },
+      nextPage: null,
+    }
+  }
+
+  return sdk.client
+    .fetch<HttpTypes.StoreProductListResponse>(
+      `/store/brands/${queryParams?.brand_id}/products`
+    )
+    .then(({ products, count }) => {
+      const nextPage = count > offset + limit ? pageParam + 1 : null
+
+      return {
+        response: {
+          products,
+          count,
+        },
+        nextPage: nextPage,
+        queryParams,
+      }
+    })
+})
+
 /**
  * This will fetch 100 products to the Next.js cache and sort them based on the sortBy parameter.
  * It will then return the paginated products based on the page and limit parameters.
@@ -101,7 +144,8 @@ export const getProductsListWithSort = cache(async function ({
   countryCode,
 }: {
   page?: number
-  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
+  queryParams?: HttpTypes.FindParams &
+    HttpTypes.StoreProductParams & { brand_id?: string }
   sortBy?: SortOptions
   countryCode: string
 }): Promise<{
@@ -113,14 +157,25 @@ export const getProductsListWithSort = cache(async function ({
 
   const {
     response: { products, count },
-  } = await getProductsList({
-    pageParam: 0,
-    queryParams: {
-      ...queryParams,
-      limit: 100,
-    },
-    countryCode,
-  })
+  } =
+    queryParams?.brand_id === undefined
+      ? await getProductsList({
+          pageParam: 0,
+          queryParams: {
+            ...queryParams,
+            limit: 100,
+          },
+          countryCode,
+        })
+      : await getProductsListByBrand({
+          pageParam: page,
+          queryParams: {
+            ...queryParams,
+            brand_id: queryParams.brand_id,
+            limit: 100,
+          },
+          countryCode,
+        })
 
   const sortedProducts = sortProducts(products, sortBy)
 

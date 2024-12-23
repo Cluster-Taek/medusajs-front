@@ -5,8 +5,9 @@ import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 import PaginatedProducts from "./paginated-products"
+import { getBrand } from "@lib/data/brands"
 
-const StoreTemplate = ({
+const StoreTemplate = async ({
   sortBy,
   brandId,
   page,
@@ -20,6 +21,8 @@ const StoreTemplate = ({
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
 
+  const brand = await getBrand({ brandId })
+
   return (
     <div
       className="flex flex-col py-6 small:flex-row small:items-start content-container"
@@ -28,7 +31,9 @@ const StoreTemplate = ({
       <RefinementList sortBy={sort} brandId={brandId} />
       <div className="w-full">
         <div className="mb-8 text-2xl-semi">
-          <h1 data-testid="store-page-title">All products</h1>
+          <h1 data-testid="store-page-title">
+            {brand?.name ?? "All products"}
+          </h1>
         </div>
         <Suspense fallback={<SkeletonProductGrid />}>
           <PaginatedProducts

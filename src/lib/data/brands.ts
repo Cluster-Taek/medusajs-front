@@ -43,3 +43,13 @@ export const getBrandsList = cache(async function ({
       }
     })
 })
+
+export const getBrand = cache(async function ({
+  brandId,
+}: {
+  brandId?: string
+}): Promise<StoreBrand | null> {
+  return brandId
+    ? sdk.client.fetch<StoreBrand>(`/store/brands/${brandId}`)
+    : null
+})

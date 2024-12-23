@@ -23,16 +23,16 @@ const RefinementList = ({
   const searchParams = useSearchParams()
 
   const createQueryString = useCallback(
-    (name: string, value: string) => {
+    (name: string, value?: string) => {
       const params = new URLSearchParams(searchParams)
-      params.set(name, value)
+      value ? params.set(name, value) : params.delete(name)
 
       return params.toString()
     },
     [searchParams]
   )
 
-  const setQueryParams = (name: string, value: string) => {
+  const setQueryParams = (name: string, value?: string) => {
     const query = createQueryString(name, value)
     router.push(`${pathname}?${query}`)
   }

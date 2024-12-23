@@ -5,7 +5,7 @@ import FilterRadioGroup from "@modules/common/components/filter-radio-group"
 
 type FilterProductsProps = {
   brandId?: string
-  setQueryParams: (name: string, value: string) => void
+  setQueryParams: (name: string, value?: string) => void
   "data-testid"?: string
 }
 
@@ -14,8 +14,10 @@ const FilterProducts = ({
   brandId,
   setQueryParams,
 }: FilterProductsProps) => {
-  const handleChange = (value: string) => {
-    setQueryParams("brandId", value)
+  const handleChange = (value?: string) => {
+    value === "all"
+      ? setQueryParams("brandId", undefined)
+      : setQueryParams("brandId", value)
   }
 
   const { data: brandsResponse } = useBrands()
@@ -23,13 +25,17 @@ const FilterProducts = ({
   return (
     <FilterRadioGroup
       title="Brand"
-      items={
-        brandsResponse?.brands?.map((brand) => ({
+      items={[
+        {
+          value: "all",
+          label: "All",
+        },
+        ...(brandsResponse?.brands?.map((brand) => ({
           value: brand.id,
           label: brand.name,
-        })) || []
-      }
-      value={brandId}
+        })) || []),
+      ]}
+      value={brandId || "all"}
       handleChange={handleChange}
       data-testid={dataTestId}
     />
